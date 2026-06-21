@@ -1,37 +1,27 @@
-from MukeshRobot import MONGO_DB_URI
-from pymongo import MongoClient
-
-myclient = MongoClient(MONGO_DB_URI)
-
-users =myclient["MUK_users"]
-usersdb = users["MUK_users"]
-
-ban_db=users["gban_db"]
-
+from MukeshRobot.modules.no_sql._pg import Session, ServedUser
 
 
 def is_served_user(user_id: int) -> bool:
-    user = usersdb.find_one({"user_id": user_id})
-    if user is not None:  # Check if the user is not None before using await
-        return True
-    return False
+    with Session() as session:
+        return session.query(ServedUser).filter_by(user_id=user_id).first() is not None
+
 
 def get_served_users() -> list:
-    users_list = []
-    for user in usersdb.find({"user_id": {"$gt": 0}}):
-        users_list.append(user)
-    return users_list
+    with Session() as session:
+        return [{"user_id": u.user_id} for u in session.query(ServedUser).all()]
+
 
 def save_id(user_id: int):
-    is_served = is_served_user(user_id)
-    if is_served:
+    if is_served_user(user_id):
         return
-    usersdb.insert_one({"user_id": user_id})
+    with Session() as session:
+        session.add(ServedUser(user_id=user_id))
+        session.commit()
+
 
 def remove_served_users(user_id: int):
-    is_served = is_served_user(user_id)
-    if not is_served:
+    if not is_served_user(user_id):
         return
-    usersdb.delete_one({"user_id": user_id})
-    
-    
+    with Session() as session:
+        session.query(ServedUser).filter_by(user_id=user_id).delete()
+        session.commit()

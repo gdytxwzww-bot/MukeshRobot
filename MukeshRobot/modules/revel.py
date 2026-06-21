@@ -14,9 +14,8 @@ from MukeshRobot import (
     pbot,
     telethn,
     updater,
-    MONGO_DB_URI,
     API_ID,
-    API_HASH
+    API_HASH,
 )
 
 from MukeshRobot import BOT_NAME,OWNER_ID
@@ -34,8 +33,7 @@ async def get_vars(_, message: Message):
 **sᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ :** `{SUPPORT_CHAT}`
 **Sᴛᴀʀᴛ Iᴍᴀɢᴇ :** `{START_IMG}`
 **Aᴘɪ Iᴅ :** `{API_ID}`
-**Aᴘɪ Hᴀsʜ :** `{API_HASH}` 
-**Mᴏɴɢᴏ Uʀʟ :** `{MONGO_DB_URI}`   
+**Aᴘɪ Hᴀsʜ :** `{API_HASH}`
 
 
 

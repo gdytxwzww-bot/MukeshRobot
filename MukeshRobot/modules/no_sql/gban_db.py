@@ -1,39 +1,40 @@
-from MukeshRobot import MONGO_DB_URI
-from pymongo import MongoClient
+from MukeshRobot.modules.no_sql._pg import Session, PgGban
 
-myclient = MongoClient(MONGO_DB_URI)
-
-users =myclient["MUK_users"]
-
-ban_db=users["gban_db"]
-
-# banned db
 
 def is_user_ingbanned(user_id: int) -> bool:
-    user = ban_db.find_one({"user_id": user_id})
-    if user is not None:  
-        return True
-    return False
+    with Session() as session:
+        return session.query(PgGban).filter_by(user_id=user_id).first() is not None
+
 
 def add_gban(user_id: int, gban_reason: str = None):
-    is_served = is_user_ingbanned(user_id)
-    if not is_served:
-        ban_db.insert_one({"user_id": user_id, "gban_reason": gban_reason or "None"})
-   
+    if is_user_ingbanned(user_id):
+        return
+    with Session() as session:
+        session.add(PgGban(user_id=user_id, reason=gban_reason or "None"))
+        session.commit()
+
 
 def remove_gban(user_id: int):
-    is_served = is_user_ingbanned(user_id)
-    if is_served:
-        ban_db.delete_one({"user_id": user_id})
-  
+    if not is_user_ingbanned(user_id):
+        return
+    with Session() as session:
+        session.query(PgGban).filter_by(user_id=user_id).delete()
+        session.commit()
+
 
 def is_gban(user_id: int) -> bool:
-    user = ban_db.find_one({"user_id": user_id, "gban_reason": {"$ne": "None"}})
-    if user:
-        return True
-    return False
+    with Session() as session:
+        return (
+            session.query(PgGban)
+            .filter(PgGban.user_id == user_id, PgGban.reason != "None")
+            .first()
+            is not None
+        )
+
+
 def get_gban_list() -> list:
-    gban_list = []
-    for user in ban_db.find({"gban_reason": {"$ne": "None"}}):
-        gban_list.append(user)
-    return gban_list
+    with Session() as session:
+        return [
+            {"user_id": g.user_id, "gban_reason": g.reason}
+            for g in session.query(PgGban).filter(PgGban.reason != "None").all()
+        ]

@@ -8,9 +8,9 @@ class Config(object):
     SUPPORT_CHAT = "" 
     START_IMG = ""
     EVENT_LOGS = ()
-    MONGO_DB_URI= ""
-   
-    DATABASE_URL = ""  # A sql database url from elephantsql.com
+    MONGO_DB_URI = None
+
+    DATABASE_URL = ""  # PostgreSQL — use DATABASE_URL env var
     CASH_API_KEY = (
         ""
     )

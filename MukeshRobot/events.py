@@ -2,15 +2,10 @@ import inspect
 import re
 from pathlib import Path
 
-from pymongo import MongoClient
 from telethon import events
 
-from MukeshRobot import MONGO_DB_URI, telethn
-
-client = MongoClient()
-client = MongoClient(MONGO_DB_URI)
-db = client["Mukesh"]
-gbanned = db.gban
+from MukeshRobot import telethn
+from MukeshRobot.modules.no_sql.gban_db import is_user_ingbanned
 
 
 def register(**args):
@@ -74,12 +69,15 @@ def callbackquery(**args):
 
     return decorator
 
+
 def Mukeshinline(**args):
     def decorator(func):
         telethn.add_event_handler(func, events.CallbackQuery(**args))
         return func
 
     return decorator
+
+
 def bot(**args):
     pattern = args.get("pattern")
     r_pattern = r"^[/]"
@@ -118,19 +116,16 @@ def bot(**args):
             if check.is_group or check.is_private:
                 pass
             else:
-                print("i don't work in channels")
                 return
             if check.is_group:
                 if check.chat.megagroup:
                     pass
                 else:
-                    print("i don't work in small chats")
                     return
 
-            users = gbanned.find({})
-            for c in users:
-                if check.sender_id == c["user"]:
-                    return
+            if is_user_ingbanned(check.sender_id):
+                return
+
             try:
                 await func(check)
                 try:
@@ -139,8 +134,6 @@ def bot(**args):
                     LOAD_PLUG.update({file_test: [func]})
             except BaseException:
                 return
-            else:
-                pass
 
         telethn.add_event_handler(wrapper, events.NewMessage(**args))
         return wrapper
