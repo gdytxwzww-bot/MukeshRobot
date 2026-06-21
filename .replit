@@ -5,6 +5,7 @@ stack = "BEST_EFFORT_FALLBACK"
 
 [nix]
 channel = "stable-25_05"
+packages = ["ffmpeg-full", "libGL", "libGLU", "openssl", "xcodebuild", "zlib"]
 
 [workflows]
 runButton = "Project"
@@ -28,3 +29,16 @@ args = "python3 -m MukeshRobot"
 
 [workflows.workflow.metadata]
 outputType = "console"
+
+[userenv]
+
+[userenv.shared]
+ENV = "True"
+SUPPORT_CHAT = "worldwide_friend_zone"
+WORKERS = "8"
+TEMP_DOWNLOAD_DIRECTORY = "./"
+ALLOW_CHATS = "True"
+STRICT_GBAN = "True"
+INFOPIC = "True"
+DEL_CMDS = "False"
+ALLOW_EXCL = "False"
