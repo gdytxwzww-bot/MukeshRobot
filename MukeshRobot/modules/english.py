@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 from PyDictionary import PyDictionary
@@ -7,7 +8,7 @@ from telethon.tl.types import *
 
 from MukeshRobot.events import register
 
-API_KEY = "6ae0c3a0-afdc-4532-a810-82ded0054236"
+API_KEY = os.environ.get("GINGER_API_KEY", "6ae0c3a0-afdc-4532-a810-82ded0054236")
 URL = "http://services.gingersoftware.com/Ginger/correct/json/GingerTheText"
 
 
